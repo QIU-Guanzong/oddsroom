@@ -105,7 +105,7 @@ export function MarketTerminal() {
         <nav>
           <a className={styles.navItemActive} href="#markets" aria-label="Markets">MK</a>
           <a className={styles.navItem} href="#rules" aria-label="Decision rules">DR</a>
-          <a className={styles.navItem} href="#positions" aria-label="Positions">PS</a>
+          <a className={styles.navItem} href="#scenario" aria-label="Local scenario">PS</a>
         </nav>
         <a className={styles.profile} href="#settings" aria-label="Settings">GQ</a>
       </aside>
@@ -126,7 +126,7 @@ export function MarketTerminal() {
 
         {source === "preview" && (
           <div className={styles.previewNotice} role="status">
-            Preview values are illustrative. Add a server-side Panta API key to display live markets and quotes.
+            Preview values are illustrative. Add a server-side Panta API key to display live market data.
           </div>
         )}
 
@@ -198,7 +198,7 @@ export function MarketTerminal() {
               <div className={styles.signalRead}>
                 <div className={styles.readLead}>
                   <span className={styles.readLabel}>Current read</span>
-                  <p>{probability === null ? "No verified YES quote is available for this market." : `The YES quote implies ${probability}%, ${probability >= threshold ? "at or above" : "below"} your ${threshold}% threshold. This is a market signal, not evidence that the event will occur.`}</p>
+                  <p>{probability === null ? "No verified YES price is available for this market." : `The YES price indicates ${probability}%, ${probability >= threshold ? "at or above" : "below"} your ${threshold}% threshold. This is a market signal, not evidence that the event will occur.`}</p>
                 </div>
                 {source === "preview" ? (
                   <ol className={styles.tape} aria-label="Illustrative preview activity">
@@ -224,8 +224,8 @@ export function MarketTerminal() {
               <button type="button" className={alertSaved ? styles.savedButton : styles.primaryButton} onClick={() => setAlertSaved(true)}>{alertSaved ? "Kept for this session" : "Keep session rule"}</button>
             </section>
 
-            <section className={styles.tradePanel} id="positions">
-              <div className={styles.tradeTitle}><h3>Trade preview</h3><span>No signature yet</span></div>
+            <section className={styles.tradePanel} id="scenario">
+              <div className={styles.tradeTitle}><h3>Local scenario</h3><span>No signature yet</span></div>
               <div className={styles.sideToggle}>
                 <button className={side === "yes" ? styles.yesActive : ""} onClick={() => setSide("yes")} type="button">YES <b>{selected.yesPrice === null ? "—" : `${Math.round(Number(selected.yesPrice) * 100)}¢`}</b></button>
                 <button className={side === "no" ? styles.noActive : ""} onClick={() => setSide("no")} type="button">NO <b>{selected.noPrice === null ? "—" : `${Math.round(Number(selected.noPrice) * 100)}¢`}</b></button>
@@ -237,13 +237,13 @@ export function MarketTerminal() {
               <dl className={styles.quoteRows}>
                 <div><dt>Estimated shares</dt><dd>{estimatedShares === null ? "Unavailable" : estimatedShares.toFixed(2)}</dd></div>
                 <div><dt>Average price</dt><dd>{sidePrice === null ? "Unavailable" : `${Math.round(sidePrice * 100)}¢`}</dd></div>
-                <div><dt>Protocol fee</dt><dd>Shown in live quote</dd></div>
+                <div><dt>Protocol fee</dt><dd>Not calculated</dd></div>
               </dl>
               <button className={styles.tradeButton} type="button" disabled>Wallet connection unavailable</button>
               <p className={styles.custodyNote}>Estimate only. Wallet signing is not connected in this build. Oddsroom never receives your keys.</p>
             </section>
 
-            <a className={styles.pantaBadge} href="https://panta.market" target="_blank" rel="noreferrer"><span>Powered by</span><strong>Panta ↗</strong></a>
+            <a className={styles.pantaBadge} href="https://panta.market" target="_blank" rel="noreferrer"><span>Market reference</span><strong>Panta ↗</strong></a>
           </aside>
         </div>
       </section>

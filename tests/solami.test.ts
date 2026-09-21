@@ -89,17 +89,14 @@ test("live Panta missing data stays unavailable; no artificial odds, dates or hi
   assert.equal(normalizePantaMarket(null),null);
 });
 
-import { POST as quote } from "../src/app/api/quote/route.ts";
-test("quote rejects malformed JSON and non-finite amounts before upstream access", async () => {
-  const previous = process.env.PANTA_API_KEY;
-  process.env.PANTA_API_KEY="synthetic-test-key";
-  try {
-    for (const body of ["{", "null", JSON.stringify({wallet:"w",marketId:"m",side:"yes",amountUsdc:"not-a-number"})]) {
-      const response = await quote(new Request("http://localhost/api/quote",{method:"POST",body}));
-      assert.equal(response.status,400);
-      assert.ok(!(await response.text()).includes("synthetic-test-key"));
-    }
-  } finally {
-    if (previous === undefined) delete process.env.PANTA_API_KEY; else process.env.PANTA_API_KEY=previous;
-  }
+import { GET as health } from "../src/app/api/health/route.ts";
+test("health is cache-safe and does not reveal deployment configuration", async () => {
+  const response = health();
+  assert.equal(response.status, 200);
+  assert.equal(response.headers.get("cache-control"), "no-store");
+  const body = await response.json() as { status: string; service: string; checkedAt: string };
+  assert.equal(body.status, "ok");
+  assert.equal(body.service, "oddsroom");
+  assert.ok(Number.isFinite(Date.parse(body.checkedAt)));
+  assert.deepEqual(Object.keys(body).sort(), ["checkedAt", "service", "status"]);
 });

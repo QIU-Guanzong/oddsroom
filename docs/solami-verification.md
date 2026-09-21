@@ -2,9 +2,9 @@
 
 ## Completed
 
-- `npm run test:solami`: 12 passing Node tests. Includes mint byte-length validation, decimal-string parsing, zero denominator, instruction-level deduplication, invalid/out-of-window rows, no-key/no-network Preview, fixed Solami authentication path, mainnet and signature/slot checks, wrong/failed/unknown transactions, stale/empty/unavailable distinction, error redaction, capped samples, request coalescing and Panta missing-data/quote validation regressions.
+- `npm run test:solami`: 12 passing Node tests. Includes mint byte-length validation, decimal-string parsing, zero denominator, instruction-level deduplication, invalid/out-of-window rows, no-key/no-network Preview, fixed Solami authentication path, mainnet and signature/slot checks, wrong/failed/unknown transactions, stale/empty/unavailable distinction, error redaction, capped samples, request coalescing, and Panta missing-data validation regressions.
 - `npm run lint`: passed.
-- `npm run build`: passed; Next.js production build includes `/api/chain-evidence`, `/api/markets`, `/api/quote`.
+- `npm run build`: passed; Next.js production build includes the chain-evidence and markets APIs.
 - Production server HTTP checks: missing key returns Preview with `trades: []` and `summary: null`; invalid mint returns 400; `Cache-Control: no-store` present.
 - Browser at desktop 1280px and mobile 390 × 844: no document horizontal overflow, market selection updates comparison, long forecast title wraps, mint validation gives an accessible error, keyboard Tab/Enter submits a corrected address, Refresh recovers after a simulated offline failure.
 - Reduced-motion emulation: respected (computed transition duration 0.00001s due to existing global reduced-motion rule). Restored browser media and viewport after checking.

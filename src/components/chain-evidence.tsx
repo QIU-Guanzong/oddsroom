@@ -42,7 +42,7 @@ export function ChainEvidence({ marketId, probability, marketSource }: { marketI
   const current = evidence?.mint === mint ? evidence : null;
   const expired = current?.source === "solami" ? clock - Date.parse(current.fetchedAt) > 90_000 : false;
   const outdated = current?.source === "solami" && (expired || !!error || current.status === "stale");
-  const label = loading ? "Loading" : error ? "Unavailable" : outdated ? "Stale snapshot" : current?.status === "ready" ? "Recent sample" : current?.status === "empty" ? "No sample" : "Preview";
+  const label = loading ? "Loading" : outdated ? "Stale snapshot" : error ? "Unavailable" : current?.status === "ready" ? "Recent sample" : current?.status === "empty" ? "No sample" : "Preview";
   function reload() { setLoading(true); setError(""); setRefresh(n => n + 1); }
   return <section className={styles.panel} aria-labelledby="chain-heading">
     <header className={styles.header}><div><span className={styles.kicker}>Solami / On-chain evidence</span><h3 id="chain-heading">Compare the forecast with the tape.</h3></div><span className={styles.status} role="status">{label}</span></header>
@@ -58,7 +58,7 @@ export function ChainEvidence({ marketId, probability, marketSource }: { marketI
       {inputError && <p id="mint-error" role="alert">{inputError}</p>}
     </form>
     <div className={styles.comparison}>
-      <div><span>{marketSource === "panta" ? "Panta · loaded quote" : "Panta · illustrative preview"}</span><strong>{probability === null ? "—" : `${probability}%`}</strong><small>YES implied probability</small></div>
+      <div><span>{marketSource === "panta" ? "Panta · loaded market price" : "Panta · illustrative preview"}</span><strong>{probability === null ? "—" : `${probability}%`}</strong><small>YES implied probability</small></div>
       <div><span>Solami Blur · last 5 min sample</span><strong>{current?.summary?.buyShare != null ? `${current.summary.buyShare.toFixed(1)}%` : "—"}</strong><small>Buy share of sampled USD volume{outdated ? " · stale" : ""}</small></div>
     </div>
     <p className={styles.message} role={error ? "alert" : undefined}>{error || current?.message || "Requesting recent on-chain evidence…"}</p>

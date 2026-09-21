@@ -20,7 +20,7 @@ The account holder can populate these **server-only** environment variables in `
 | Variable | Purpose |
 | --- | --- |
 | `SOLAMI_API_KEY` | Standard key with `DataApi` and RPC read permissions. Blank = Preview, no on-chain numbers. |
-| `PANTA_API_KEY` | Panta market API credential. Blank = labelled illustrative forecasts. |
+| `PANTA_API_KEY` | Panta market-catalog credential. Blank = labelled illustrative forecasts. |
 | `PANTA_API_BASE_URL` | Defaults to `https://live-api.panta.market/api/v1`. Server-controlled only. |
 
 Do not paste keys into a mint field, query URL, screenshot, recording, issue or submission. Never use `NEXT_PUBLIC_` for either credential. Solami upstream URLs use the documented `api_key` query parameter **only on the server**; do not enable full outbound URL logging on the host. Errors never return upstream bodies, URLs or secrets. The app sends no wallet transactions.
@@ -43,7 +43,7 @@ Do not paste keys into a mint field, query URL, screenshot, recording, issue or 
 - **RPC:** `getGenesisHash` checks mainnet; `getSignatureStatuses` checks up to five unique sampled signatures, requiring successful confirmed/finalized status and a matching slot. It cross-checks transaction inclusion, **not the decoded dollar amounts**. Unchecked/unknown/failed transactions never receive verified badges.
 - Record request time, observation window, rejected/duplicate counts and whether the 100-row limit was reached. Display the latest eight rows; totals cover all valid rows in this bounded response.
 
-Both upstream hosts are fixed official Solami endpoints; a browser cannot supply a URL or key. Calls time out after eight seconds and refuse redirects. A 15-second bounded process cache coalesces simultaneous requests. Client responses use `Cache-Control: no-store`. Production hosts should enforce request quotas at the edge; the process cache is not a global rate limiter.
+Both upstream hosts are fixed official Solami endpoints; a browser cannot supply a URL or key. Calls time out after eight seconds and refuse redirects. A 15-second bounded process cache coalesces simultaneous requests. Client responses use `Cache-Control: no-store`. The cache is not a rate limiter: before enabling a live Solami key on Vercel, protect `/api/chain-evidence` with a Vercel WAF IP rate-limit rule and verify that the rule blocks excess requests.
 
 ### Limits and provenance
 
@@ -52,7 +52,7 @@ Both upstream hosts are fixed official Solami endpoints; a browser cannot supply
 - A newest trade older than 90 seconds is stale. RPC failure leaves data provider-reported with an explicit cross-check warning. A wrong genesis never passes the mainnet check.
 - Invalid upstream schemas and authentication failures produce unavailable states; they never fall back to fixtures.
 - Panta's market-list endpoint does not supply probability history here. Live missing prices, volumes and deadlines remain unavailable; Oddsroom generates no synthetic live chart or complementary NO price.
-- The quote route exists, but the visible trade estimate is not an executable quote. There is no wallet-signing flow. Decision thresholds are session-only, without notifications.
+- The visible trade estimate is a local, non-executable calculation. There is no wallet-signing flow. Decision thresholds are session-only, without notifications.
 
 ## Verify
 
@@ -67,13 +67,21 @@ Tests use deliberately synthetic, dependency-injected upstream responses. They p
 
 ## Deploy
 
-Deploy as a Next.js Node application, not a static export: both APIs must run on the server. An account holder must create/approve any new hosting account and enter credentials. Set the environment variables above, build with `npm run build`, and run `npm start`. A blank-key deployment is a public Preview only; it is not proof of a live hackathon submission. Public hosting has not yet been provisioned for this repository.
+Deploy as a Next.js Node application, not a static export: both APIs must run on the server. An account holder must create or approve any new hosting account and enter credentials. A blank-key deployment is a public Preview only; it is not proof of a live hackathon submission. Public hosting has not yet been provisioned for this repository.
+
+### Vercel Preview and post-deploy check
+
+1. Import the repository into Vercel and make the first Preview deployment with live data variables blank. Confirm the visible Preview state contains no chain values.
+2. Before entering a live `SOLAMI_API_KEY` in any Vercel environment, create a Vercel WAF IP rate-limit rule for `/api/chain-evidence`. Test that it blocks excess requests, then add the server-only key and redeploy. Do not rely on the in-process cache for this control.
+3. On the protected deployment, verify that an invalid mint returns `400`, evidence responses send `Cache-Control: no-store`, and a successful connected response is labelled Solami rather than Preview. Check one current explorer link and the RPC status in the browser; a stale, empty, or unavailable response is not live-demo evidence.
+4. If a Panta credential is enabled, confirm the market source label reflects the real catalog response and that missing market fields remain unavailable. Do not represent the local trade calculation as a live executable price.
 
 ## Sources and track
 
-Verified 2026-09-21 from the current interactive official documentation:
+Verified 2026-09-22 from the current official listing and documentation:
 
-- [Solami track rules](https://superteam.fun/earn/listing/build-something-live-on-solana-data/): meaningful Solami usage, public runnable repository and a 2–3 minute live-mainnet demo. A non-live submission is not judged.
+- [Crypto World's Fair Solami track rules](https://superteam.fun/earn/listing/build-something-live-on-solana-data/): Solami must be a meaningful live data path, the public repository must have runnable setup and own-key instructions, and the 2–3 minute video or Loom must run on Solana mainnet. A project that does not run live is not judged.
+- The current submission form requires project name, description, public GitHub link, a pitch deck or Loom/video link, and a Yes/No answer on Frontier Hackathon submission. Website, X, and Colosseum links are optional. The listing is human-only; the account holder must recheck the live page and complete final submission.
 - [Blur data API](https://solami.dev/docs/blur), [token trades contract](https://solami.dev/docs/api/get_data-token-trades), [canonical endpoints/auth](https://solami.dev/docs/endpoints).
 - [Design rationale](docs/solami-design.md).
 

@@ -4,11 +4,13 @@
 
 Current state: **Preview only; no Solami/Panta key installed, no public deployment, no live-mainnet verification or recording.** Screenshots demonstrate UI and honest unavailable states, not live qualification.
 
-1. Account holder opens the [track signup offer](https://solami.dev/signup?ref=st-earn-sep-26), completes account/terms steps, and creates a standard key with DataApi plus read-only RPC access. Never expose the key on video or in chat.
-2. Account holder adds `SOLAMI_API_KEY` to server secrets, adds a Panta credential for real forecasts, and approves any new hosting account. Restart/redeploy.
-3. Open Oddsroom, select a genuinely relevant forecast and deliberately choose the associated/contextual mint. Do not claim Wrapped SOL demand establishes a throughput, Fed or Bitcoin outcome.
-4. Require a recent non-empty Blur response, matching mint, current timestamps, mainnet genesis and successful sampled transaction checks. Follow an explorer link. If any requirement fails, stop and fix it; Preview is not entry evidence.
-5. Record a 2–3 minute live session. Keep the repo public and record the deployment URL, UTC capture time and commit. API/account screens with secrets must not appear.
+1. Account holder opens the [track signup offer](https://solami.dev/signup?ref=st-earn-sep-26), completes account and terms steps, and creates a standard key with DataApi plus read-only RPC access. Never expose the key on video or in chat.
+2. Account holder creates or approves a Vercel project and deploys a blank-key Preview first. Confirm it visibly says Preview and shows no chain values; this is a UI check, not qualifying live evidence.
+3. Before adding `SOLAMI_API_KEY` to any Vercel environment, configure a Vercel WAF IP rate-limit rule for `/api/chain-evidence` and test that it blocks excess requests. Only then add the server-only Solami key, add a Panta catalog credential if real markets are needed, and redeploy.
+4. On the protected deployment, check an invalid mint returns `400`, evidence responses use `Cache-Control: no-store`, and a connected response is visibly Solami rather than Preview. Confirm one current explorer link and RPC status in the browser.
+5. Open Oddsroom, select a genuinely relevant forecast and deliberately choose the associated or contextual mint. Do not claim Wrapped SOL demand establishes a throughput, Fed, or Bitcoin outcome.
+6. Require a recent non-empty Blur response, matching mint, current timestamps, mainnet genesis, and successful sampled transaction checks. If any requirement fails, stop and fix it; Preview, stale, empty, and unavailable states are not entry evidence.
+7. Record a 2–3 minute live session. Keep the repository public and record the deployment URL, UTC capture time, and commit. API/account screens with secrets must not appear.
 
 ## 2:30 walkthrough
 
@@ -21,6 +23,6 @@ Current state: **Preview only; no Solami/Panta key installed, no public deployme
 
 ## Final submission
 
-Prepare the repo URL, public app URL and uploaded recording. Review the [official listing](https://superteam.fun/earn/listing/build-something-live-on-solana-data/) and let the account holder perform the platform's final submission. This task does not authorize creating accounts, signing, payments or submitting on their behalf.
+The [official Crypto World's Fair listing](https://superteam.fun/earn/listing/build-something-live-on-solana-data/) requires meaningful Solami work, a public runnable repository with setup and own-key instructions, and a 2–3 minute live-mainnet Loom or video. A non-live project is not judged. Prepare the required project name, description, public GitHub link, Loom/video or pitch-deck link, and the Yes/No Frontier Hackathon answer; website, X, and Colosseum links are optional. The listing is human-only, so the account holder must recheck the live page and perform final submission.
 
 No revenue has been recorded. Awards, expected prizes, points, balances without a readable receipt and submission acknowledgements are not income.

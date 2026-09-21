@@ -5,6 +5,7 @@ const PANTA_BASE =
   process.env.PANTA_API_BASE_URL ?? "https://live-api.panta.market/api/v1";
 
 export async function GET(request: Request) {
+  const headers = { "Cache-Control": "no-store" };
   const apiKey = process.env.PANTA_API_KEY;
   if (!apiKey) {
     const body: MarketsResponse = {
@@ -12,7 +13,7 @@ export async function GET(request: Request) {
       source: "preview",
       message: "Add PANTA_API_KEY to load live Panta markets.",
     };
-    return Response.json(body);
+    return Response.json(body, { headers });
   }
 
   const url = new URL(request.url);
@@ -31,13 +32,13 @@ export async function GET(request: Request) {
       redirect: "error",
     });
     const payload = await response.json();
-    if (!response.ok || !Array.isArray(payload.items)) return Response.json({ error: "Panta markets are unavailable." }, { status: 502 });
+    if (!response.ok || !Array.isArray(payload.items)) return Response.json({ error: "Panta markets are unavailable." }, { status: 502, headers });
     const body: MarketsResponse = {
       items: payload.items.map(normalizePantaMarket).filter((item: ReturnType<typeof normalizePantaMarket>) => item !== null),
       source: "panta",
     };
-    return Response.json(body);
+    return Response.json(body, { headers });
   } catch {
-    return Response.json({ error: "Panta is temporarily unavailable." }, { status: 502 });
+    return Response.json({ error: "Panta is temporarily unavailable." }, { status: 502, headers });
   }
 }
