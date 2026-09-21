@@ -1,36 +1,33 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Oddsroom
 
-## Getting Started
+Oddsroom is an evidence-first decision desk powered by Panta prediction markets. It helps operators discover a market, read its probability and trade activity, set an explicit decision threshold, and prepare a wallet-signed trade without giving the app custody of keys.
 
-First, run the development server:
+## Current scope
+
+- Responsive market desk with search and category filters
+- Probability and volume readouts with explicit signal-vs-fact language
+- Decision threshold rules
+- YES/NO trade preview
+- Server-side Panta market proxy and primary-order quote proxy
+- Clearly labelled preview data when no Panta credential is configured
+
+## Run locally
 
 ```bash
+cp .env.example .env.local
+# Replace PANTA_API_KEY with a test key from Panta.
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open `http://localhost:3000`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Custody and secrets
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+`PANTA_API_KEY` is read only by Next.js route handlers. Wallet signing will remain client-side. Do not commit `.env.local`, wallet keys, seed phrases, JWTs, or Panta API secrets.
 
-## Learn More
+## Data status
 
-To learn more about Next.js, take a look at the following resources:
+Without `PANTA_API_KEY`, Oddsroom uses visibly labelled illustrative preview values. Preview values are not market facts and cannot be submitted as evidence of live Panta integration.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Powered by Panta.
