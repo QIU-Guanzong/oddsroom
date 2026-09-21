@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import type { Market, MarketsResponse } from "@/lib/markets";
 import styles from "./market-terminal.module.css";
+import { ChainEvidence } from "./chain-evidence";
 
 type Side = "yes" | "no";
 
@@ -24,13 +25,15 @@ function Sparkline({ points }: { points: number[] }) {
   );
 }
 
-function formatMoney(value: string) {
+function formatMoney(value: string | null) {
+  if (value === null) return "Unavailable";
   return new Intl.NumberFormat("en-US", {
     style: "currency", currency: "USD", notation: "compact", maximumFractionDigits: 1,
   }).format(Number(value));
 }
 
-function formatDeadline(timestamp: number) {
+function formatDeadline(timestamp: number | null) {
+  if (timestamp === null) return "Unavailable";
   return new Intl.DateTimeFormat("en-US", {
     month: "short", day: "numeric", year: "numeric",
   }).format(new Date(timestamp * 1000));
@@ -84,14 +87,15 @@ export function MarketTerminal() {
     visibleMarkets[0] ||
     markets.find((market) => market.marketId === selectedId) ||
     markets[0];
-  const probability = selected ? Math.round(Number(selected.yesPrice) * 100) : 0;
+  const probability = selected?.yesPrice != null ? Math.round(Number(selected.yesPrice) * 100) : null;
   const amountNumber = Number(amount) || 0;
-  const sidePrice = selected ? Number(side === "yes" ? selected.yesPrice : selected.noPrice) : 0;
-  const estimatedShares = sidePrice > 0 ? amountNumber / sidePrice : 0;
+  const priceValue = selected ? (side === "yes" ? selected.yesPrice : selected.noPrice) : null;
+  const sidePrice = priceValue !== null ? Number(priceValue) : null;
+  const estimatedShares = sidePrice !== null && sidePrice > 0 ? amountNumber / sidePrice : null;
 
   if (loading) return <main className={styles.loading}>Opening the market desk…</main>;
   if (error || !selected) {
-    return <main className={styles.loading}><strong>Desk unavailable</strong><span>{error || "No markets are available."}</span></main>;
+    return <main className={styles.loading}><strong>Desk unavailable</strong><span>{error || "No markets are available."}</span><button type="button" onClick={() => window.location.reload()}>Retry markets</button></main>;
   }
 
   return (
@@ -114,9 +118,9 @@ export function MarketTerminal() {
           </div>
           <div className={styles.topActions}>
             <span className={source === "panta" ? styles.liveBadge : styles.previewBadge}>
-              <i /> {source === "panta" ? "Panta live" : "Preview data"}
+              <i /> {source === "panta" ? "Panta API" : "Preview data"}
             </span>
-            <button className={styles.walletButton} type="button">Connect wallet</button>
+            <button className={styles.walletButton} type="button" disabled>Wallet unavailable</button>
           </div>
         </header>
 
@@ -143,12 +147,12 @@ export function MarketTerminal() {
             </div>
             <div className={styles.marketList}>
               {visibleMarkets.map((market) => {
-                const yes = Math.round(Number(market.yesPrice) * 100);
+                const yes = market.yesPrice === null ? "Unavailable" : `${Math.round(Number(market.yesPrice) * 100)}% YES`;
                 return (
                   <button type="button" key={market.marketId} onClick={() => setSelectedId(market.marketId)} className={market.marketId === selected.marketId ? styles.marketActive : styles.market}>
                     <span className={styles.marketMeta}>{market.category} · {market.phase}</span>
                     <strong>{market.title}</strong>
-                    <span className={styles.marketStats}><b>{yes}% YES</b><span>{formatMoney(market.volumeUsdc)} vol.</span></span>
+                    <span className={styles.marketStats}><b>{yes}</b><span>{formatMoney(market.volumeUsdc)} vol.</span></span>
                   </button>
                 );
               })}
@@ -163,18 +167,17 @@ export function MarketTerminal() {
                 <h2>{selected.title}</h2>
                 <p>{selected.description}</p>
               </div>
-              <button className={styles.watchButton} type="button">＋ Watch</button>
+
             </div>
 
             <div className={styles.signalBlock}>
               <div className={styles.probability}>
                 <span>Market probability</span>
-                <strong>{probability}<small>%</small></strong>
-                <em className={selected.change24h >= 0 ? styles.up : styles.down}>{selected.change24h >= 0 ? "+" : ""}{selected.change24h.toFixed(1)} pts / 24h</em>
+                <strong>{probability ?? "—"}{probability !== null && <small>%</small>}</strong>
+                {selected.change24h !== null ? <em className={selected.change24h >= 0 ? styles.up : styles.down}>{selected.change24h >= 0 ? "+" : ""}{selected.change24h.toFixed(1)} pts / 24h</em> : <em>24h change unavailable</em>}
               </div>
               <div className={styles.chartWrap}>
-                <div className={styles.chartLegend}><span>7 days</span><span>Now</span></div>
-                <Sparkline points={selected.sparkline} />
+                {selected.sparkline.length > 1 ? <><div className={styles.chartLegend}><span>{source === "preview" ? "Illustrative trend" : "History"}</span><span>Now</span></div><Sparkline points={selected.sparkline} /></> : <p className={styles.tapeEmpty}>Probability history unavailable</p>}
               </div>
             </div>
 
@@ -182,8 +185,10 @@ export function MarketTerminal() {
               <div><span>Volume</span><strong>{formatMoney(selected.volumeUsdc)}</strong></div>
               <div><span>Closes</span><strong>{formatDeadline(selected.endTime)}</strong></div>
               <div><span>Phase</span><strong>{selected.phase}</strong></div>
-              <div><span>Signal</span><strong>{probability >= threshold ? "Above rule" : "Below rule"}</strong></div>
+              <div><span>Signal</span><strong>{probability === null ? "Unavailable" : probability >= threshold ? "Above rule" : "Below rule"}</strong></div>
             </div>
+
+            <ChainEvidence marketId={selected.marketId} probability={probability} marketSource={source} />
 
             <section className={styles.evidenceSection}>
               <div className={styles.sectionHeading}>
@@ -193,7 +198,7 @@ export function MarketTerminal() {
               <div className={styles.signalRead}>
                 <div className={styles.readLead}>
                   <span className={styles.readLabel}>Current read</span>
-                  <p>The market leans YES, but the price remains below your {threshold}% action threshold. Volume is sufficient to monitor; wait for confirmation before acting.</p>
+                  <p>{probability === null ? "No verified YES quote is available for this market." : `The YES quote implies ${probability}%, ${probability >= threshold ? "at or above" : "below"} your ${threshold}% threshold. This is a market signal, not evidence that the event will occur.`}</p>
                 </div>
                 {source === "preview" ? (
                   <ol className={styles.tape} aria-label="Illustrative preview activity">
@@ -202,7 +207,7 @@ export function MarketTerminal() {
                     <li><time>11:06</time><span>Preview · YES</span><b>$260</b></li>
                   </ol>
                 ) : (
-                  <div className={styles.tapeEmpty}>Select a live market to load its verified trade tape.</div>
+                  <div className={styles.tapeEmpty}>Panta trade tape is not available in this build. Solami token trades appear separately above.</div>
                 )}
               </div>
             </section>
@@ -211,31 +216,31 @@ export function MarketTerminal() {
           <aside className={styles.actionRail}>
             <section className={styles.rulePanel} id="rules">
               <div className={styles.sectionHeading}><div><span className={styles.sectionNumber}>03</span><h3>Decision rule</h3></div></div>
-              <p className={styles.ruleText}>Notify me when YES reaches</p>
+              <p className={styles.ruleText}>Review when YES reaches</p>
               <div className={styles.thresholdValue}>{threshold}%</div>
               <input className={styles.range} type="range" min="50" max="90" step="1" value={threshold} onChange={(event) => { setThreshold(Number(event.target.value)); setAlertSaved(false); }} aria-label="Alert probability threshold" />
               <div className={styles.rangeLabels}><span>50%</span><span>90%</span></div>
-              <label className={styles.ruleCheck}><input type="checkbox" defaultChecked /><span>Require at least $10k volume</span></label>
-              <button type="button" className={alertSaved ? styles.savedButton : styles.primaryButton} onClick={() => setAlertSaved(true)}>{alertSaved ? "Rule saved" : "Save rule"}</button>
+              <p className={styles.ruleCheck}>Session threshold only. Notifications are not connected.</p>
+              <button type="button" className={alertSaved ? styles.savedButton : styles.primaryButton} onClick={() => setAlertSaved(true)}>{alertSaved ? "Kept for this session" : "Keep session rule"}</button>
             </section>
 
             <section className={styles.tradePanel} id="positions">
               <div className={styles.tradeTitle}><h3>Trade preview</h3><span>No signature yet</span></div>
               <div className={styles.sideToggle}>
-                <button className={side === "yes" ? styles.yesActive : ""} onClick={() => setSide("yes")} type="button">YES <b>{Math.round(Number(selected.yesPrice) * 100)}¢</b></button>
-                <button className={side === "no" ? styles.noActive : ""} onClick={() => setSide("no")} type="button">NO <b>{Math.round(Number(selected.noPrice) * 100)}¢</b></button>
+                <button className={side === "yes" ? styles.yesActive : ""} onClick={() => setSide("yes")} type="button">YES <b>{selected.yesPrice === null ? "—" : `${Math.round(Number(selected.yesPrice) * 100)}¢`}</b></button>
+                <button className={side === "no" ? styles.noActive : ""} onClick={() => setSide("no")} type="button">NO <b>{selected.noPrice === null ? "—" : `${Math.round(Number(selected.noPrice) * 100)}¢`}</b></button>
               </div>
               <label className={styles.amountField}>
                 <span>Amount</span>
                 <div><input value={amount} onChange={(event) => setAmount(event.target.value)} inputMode="decimal" aria-label="Trade amount" /><b>USDC</b></div>
               </label>
               <dl className={styles.quoteRows}>
-                <div><dt>Estimated shares</dt><dd>{estimatedShares.toFixed(2)}</dd></div>
-                <div><dt>Average price</dt><dd>{Math.round(sidePrice * 100)}¢</dd></div>
+                <div><dt>Estimated shares</dt><dd>{estimatedShares === null ? "Unavailable" : estimatedShares.toFixed(2)}</dd></div>
+                <div><dt>Average price</dt><dd>{sidePrice === null ? "Unavailable" : `${Math.round(sidePrice * 100)}¢`}</dd></div>
                 <div><dt>Protocol fee</dt><dd>Shown in live quote</dd></div>
               </dl>
-              <button className={styles.tradeButton} type="button">Connect wallet to quote</button>
-              <p className={styles.custodyNote}>Oddsroom never receives your keys. Panta builds the transaction; your wallet signs it.</p>
+              <button className={styles.tradeButton} type="button" disabled>Wallet connection unavailable</button>
+              <p className={styles.custodyNote}>Estimate only. Wallet signing is not connected in this build. Oddsroom never receives your keys.</p>
             </section>
 
             <a className={styles.pantaBadge} href="https://panta.market" target="_blank" rel="noreferrer"><span>Powered by</span><strong>Panta ↗</strong></a>

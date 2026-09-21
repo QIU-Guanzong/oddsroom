@@ -3,13 +3,13 @@ export type Market = {
   category: string;
   title: string;
   description: string;
-  phase: "primary" | "secondary" | "resolved" | "cancelled";
+  phase: "primary" | "secondary" | "resolved" | "cancelled" | "unknown";
   region: string;
-  volumeUsdc: string;
-  yesPrice: string;
-  noPrice: string;
-  endTime: number;
-  change24h: number;
+  volumeUsdc: string | null;
+  yesPrice: string | null;
+  noPrice: string | null;
+  endTime: number | null;
+  change24h: number | null;
   sparkline: number[];
 };
 

@@ -1,33 +1,80 @@
 # Oddsroom
 
-Oddsroom is an evidence-first decision desk powered by Panta prediction markets. It helps operators discover a market, read its probability and trade activity, set an explicit decision threshold, and prepare a wallet-signed trade without giving the app custody of keys.
+An evidence desk that puts a Panta forecast next to **Solami Blur mainnet trade flow**, so a researcher can inspect the underlying transactions before drawing a conclusion. Token buying pressure is context, not a prediction probability or proof of an event outcome.
 
-## Current scope
+**Status:** implementation and automated validation complete; live credential acceptance, public deployment and the required mainnet demo remain pending. With no credentials, the app explicitly shows Preview. No Solami trades are fabricated. Wallet connection/signing and notifications are unavailable in this build.
 
-- Responsive market desk with search and category filters
-- Probability and volume readouts with explicit signal-vs-fact language
-- Decision threshold rules
-- YES/NO trade preview
-- Server-side Panta market proxy and primary-order quote proxy
-- Clearly labelled preview data when no Panta credential is configured
+## Run
 
-## Run locally
+Requires Node.js 22.18+ and npm. Use an active supported Node LTS release for hosting.
 
-```bash
+```sh
+npm ci
 cp .env.example .env.local
-# Replace PANTA_API_KEY with a test key from Panta.
-npm install
 npm run dev
+# http://localhost:3000
 ```
 
-Open `http://localhost:3000`.
+The account holder can populate these **server-only** environment variables in `.env.local` or the host's secret settings, then restart:
 
-## Custody and secrets
+| Variable | Purpose |
+| --- | --- |
+| `SOLAMI_API_KEY` | Standard key with `DataApi` and RPC read permissions. Blank = Preview, no on-chain numbers. |
+| `PANTA_API_KEY` | Panta market API credential. Blank = labelled illustrative forecasts. |
+| `PANTA_API_BASE_URL` | Defaults to `https://live-api.panta.market/api/v1`. Server-controlled only. |
 
-`PANTA_API_KEY` is read only by Next.js route handlers. Wallet signing will remain client-side. Do not commit `.env.local`, wallet keys, seed phrases, JWTs, or Panta API secrets.
+Do not paste keys into a mint field, query URL, screenshot, recording, issue or submission. Never use `NEXT_PUBLIC_` for either credential. Solami upstream URLs use the documented `api_key` query parameter **only on the server**; do not enable full outbound URL logging on the host. Errors never return upstream bodies, URLs or secrets. The app sends no wallet transactions.
 
-## Data status
+## Use the evidence desk
 
-Without `PANTA_API_KEY`, Oddsroom uses visibly labelled illustrative preview values. Preview values are not market facts and cannot be submitted as evidence of live Panta integration.
+1. Select a Panta market. Its source is independent of the chain-evidence source.
+2. Choose a Solana mint in **On-chain evidence**. Wrapped SOL is the default, explicitly identified as context; it is not claimed to be a Panta outcome token or settlement source.
+3. Compare the market's YES probability with the buy share of the sampled token's USD trade volume. These are different measures, not calibrated forecasts.
+4. Inspect buy/sell/net volume, timestamps, the latest eight trade rows and their mainnet explorer links.
+5. Refresh manually or enable 30-second polling. Hidden tabs do not poll. After 90 seconds a retained snapshot is labelled stale. Failed refreshes keep the last snapshot visibly stale, with a retry action.
 
-Powered by Panta.
+## What Solami does
+
+`GET /api/chain-evidence?mint=<32-byte-base58-address>` runs a meaningful read pipeline:
+
+- **Blur:** `https://api.solami.dev/data/token/trades?chain=solana&address=...&after_time=...&before_time=...&limit=100` requests up to 100 recent swaps within five minutes, across pools.
+- Parse documented decimal strings; reject invalid amounts, identifiers, slots and times. Ignore out-of-window and future rows. Deduplicate by signature + instruction index + pool, preserving different swaps in the same transaction.
+- Compute sampled buy USD, sell USD, net USD and buy share = buy USD / (buy USD + sell USD). A zero denominator is unavailable, not 0%.
+- **RPC:** `getGenesisHash` checks mainnet; `getSignatureStatuses` checks up to five unique sampled signatures, requiring successful confirmed/finalized status and a matching slot. It cross-checks transaction inclusion, **not the decoded dollar amounts**. Unchecked/unknown/failed transactions never receive verified badges.
+- Record request time, observation window, rejected/duplicate counts and whether the 100-row limit was reached. Display the latest eight rows; totals cover all valid rows in this bounded response.
+
+Both upstream hosts are fixed official Solami endpoints; a browser cannot supply a URL or key. Calls time out after eight seconds and refuse redirects. A 15-second bounded process cache coalesces simultaneous requests. Client responses use `Cache-Control: no-store`. Production hosts should enforce request quotas at the edge; the process cache is not a global rate limiter.
+
+### Limits and provenance
+
+- A five-minute query is a **bounded sample**, not complete five-minute volume, 24h volume, unique wallets or liquidity. No liquidity metric is implemented or claimed.
+- Blur REST history is beta and can change as Solami reindexes. Empty results do not establish zero chain activity.
+- A newest trade older than 90 seconds is stale. RPC failure leaves data provider-reported with an explicit cross-check warning. A wrong genesis never passes the mainnet check.
+- Invalid upstream schemas and authentication failures produce unavailable states; they never fall back to fixtures.
+- Panta's market-list endpoint does not supply probability history here. Live missing prices, volumes and deadlines remain unavailable; Oddsroom generates no synthetic live chart or complementary NO price.
+- The quote route exists, but the visible trade estimate is not an executable quote. There is no wallet-signing flow. Decision thresholds are session-only, without notifications.
+
+## Verify
+
+```sh
+npm run test:solami  # Node test runner, includes Panta truthfulness regression
+npm run lint
+npm run build
+npm start
+```
+
+Tests use deliberately synthetic, dependency-injected upstream responses. They prove parsing, aggregation, authentication placement, freshness, failure isolation, RPC checks and cache coalescing, not live service connectivity. No test fixtures ship through the production API. See [verification](docs/solami-verification.md) and [demo preparation](docs/solami-demo.md).
+
+## Deploy
+
+Deploy as a Next.js Node application, not a static export: both APIs must run on the server. An account holder must create/approve any new hosting account and enter credentials. Set the environment variables above, build with `npm run build`, and run `npm start`. A blank-key deployment is a public Preview only; it is not proof of a live hackathon submission. Public hosting has not yet been provisioned for this repository.
+
+## Sources and track
+
+Verified 2026-09-21 from the current interactive official documentation:
+
+- [Solami track rules](https://superteam.fun/earn/listing/build-something-live-on-solana-data/): meaningful Solami usage, public runnable repository and a 2–3 minute live-mainnet demo. A non-live submission is not judged.
+- [Blur data API](https://solami.dev/docs/blur), [token trades contract](https://solami.dev/docs/api/get_data-token-trades), [canonical endpoints/auth](https://solami.dev/docs/endpoints).
+- [Design rationale](docs/solami-design.md).
+
+No submission, prize or income is claimed. Only independently verifiable received funds count as revenue.
