@@ -12,6 +12,10 @@ const mono = IBM_Plex_Mono({
 export const metadata: Metadata = {
   title: "Oddsroom — Market signals for real decisions",
   description: "An evidence-first decision desk powered by Panta prediction markets.",
+  icons: {
+    icon: "/oddsroom-mark.png",
+    apple: "/oddsroom-mark.png",
+  },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
