@@ -86,3 +86,7 @@ Verified 2026-09-22 from the current official listing and documentation:
 - [Design rationale](docs/solami-design.md).
 
 No submission, prize or income is claimed. Only independently verifiable received funds count as revenue.
+
+## Project provenance
+
+The project license, dependency status, service references, and repository-asset handoff are documented in [project provenance and third-party notices](docs/project-provenance.md). The team must recheck that disclosure before submitting any new code, recording, or profile material.

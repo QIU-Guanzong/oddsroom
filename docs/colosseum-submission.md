@@ -30,6 +30,8 @@ Hong Kong
 
 This public repository contains the hackathon product, its Panta and Solami server adapters, visible Preview/Live provenance states, and setup instructions. No API key or wallet secret is committed. Preview data is labelled and cannot be mistaken for live integration evidence.
 
+The repository is MIT licensed. Direct packages are declared in `package.json` and locked in `package-lock.json`; service and asset provenance is documented in [project provenance and third-party notices](project-provenance.md). Recheck that disclosure before final upload.
+
 ### Work by people outside the listed team
 
 No person outside the listed team performed meaningful project work.
