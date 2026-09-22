@@ -90,3 +90,5 @@ No submission, prize or income is claimed. Only independently verifiable receive
 ## Project provenance
 
 The project license, dependency status, service references, and repository-asset handoff are documented in [project provenance and third-party notices](docs/project-provenance.md). The team must recheck that disclosure before submitting any new code, recording, or profile material.
+
+A Git-backed record of the competition-period changes, validation evidence, third-party status, and open live requirements is in the [competition work timeline](docs/competition-work-timeline.md).
