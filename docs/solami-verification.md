@@ -2,7 +2,7 @@
 
 ## Completed
 
-- `npm run test:solami`: 12 passing Node tests. Includes mint byte-length validation, decimal-string parsing, zero denominator, instruction-level deduplication, invalid/out-of-window rows, no-key/no-network Preview, fixed Solami authentication path, mainnet and signature/slot checks, wrong/failed/unknown transactions, stale/empty/unavailable distinction, error redaction, capped samples, request coalescing, and Panta missing-data validation regressions.
+- `npm run test:solami`: 13 passing Node tests. Includes mint byte-length validation, decimal-string parsing, zero denominator, instruction-level deduplication, invalid/out-of-window rows, no-key/no-network Preview, fixed Solami authentication path, mainnet and signature/slot checks, wrong/failed/unknown transactions, stale/empty/unavailable distinction, error redaction, capped samples, request coalescing, Panta missing-data validation, and canonical Panta endpoint pinning.
 - `npm run lint`: passed.
 - `npm run build`: passed; Next.js production build includes the chain-evidence and markets APIs.
 - Production server HTTP checks: missing key returns Preview with `trades: []` and `summary: null`; invalid mint returns 400; `Cache-Control: no-store` present.

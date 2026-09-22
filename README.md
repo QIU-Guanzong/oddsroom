@@ -21,7 +21,7 @@ The account holder can populate these **server-only** environment variables in `
 | --- | --- |
 | `SOLAMI_API_KEY` | Standard key with `DataApi` and RPC read permissions. Blank = Preview, no on-chain numbers. |
 | `PANTA_API_KEY` | Panta market-catalog credential. Blank = labelled illustrative forecasts. |
-| `PANTA_API_BASE_URL` | Defaults to `https://live-api.panta.market/api/v1`. Server-controlled only. |
+| `PANTA_API_BASE_URL` | Defaults to `https://live-api.panta.market/api/v1`. Only that HTTPS endpoint is accepted, so a deployment typo cannot forward the catalog key elsewhere. |
 
 Do not paste keys into a mint field, query URL, screenshot, recording, issue or submission. Never use `NEXT_PUBLIC_` for either credential. Solami upstream URLs use the documented `api_key` query parameter **only on the server**; do not enable full outbound URL logging on the host. Errors never return upstream bodies, URLs or secrets. The app sends no wallet transactions.
 

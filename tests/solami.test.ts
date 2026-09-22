@@ -89,6 +89,17 @@ test("live Panta missing data stays unavailable; no artificial odds, dates or hi
   assert.equal(normalizePantaMarket(null),null);
 });
 
+import { pantaMarketsUrl } from "../src/lib/panta-endpoint.ts";
+test("Panta catalog credentials stay pinned to the canonical endpoint", () => {
+  const requested = "http://localhost/api/markets?category=Crypto&status=primary&cursor=next&limit=20";
+  const url = pantaMarketsUrl(requested, "https://live-api.panta.market/api/v1");
+  assert.equal(url?.href, "https://live-api.panta.market/api/v1/markets/?category=Crypto&status=primary&cursor=next&limit=20");
+  assert.equal(pantaMarketsUrl(requested, "https://attacker.example/api/v1"), null);
+  assert.equal(pantaMarketsUrl(requested, "http://live-api.panta.market/api/v1"), null);
+  assert.equal(pantaMarketsUrl(requested, "https://live-api.panta.market/api/v1?redirect=https://attacker.example"), null);
+  assert.equal(pantaMarketsUrl("http://localhost/api/markets?limit=500", "https://live-api.panta.market/api/v1")?.searchParams.get("limit"), "30");
+});
+
 import { GET as health } from "../src/app/api/health/route.ts";
 test("health is cache-safe and does not reveal deployment configuration", async () => {
   const response = health();

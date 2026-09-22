@@ -1,8 +1,6 @@
 import { normalizePantaMarket } from "@/lib/panta-normalize";
+import { pantaMarketsUrl } from "@/lib/panta-endpoint";
 import { previewMarkets, type MarketsResponse } from "@/lib/markets";
-
-const PANTA_BASE =
-  process.env.PANTA_API_BASE_URL ?? "https://live-api.panta.market/api/v1";
 
 export async function GET(request: Request) {
   const headers = { "Cache-Control": "no-store" };
@@ -16,13 +14,10 @@ export async function GET(request: Request) {
     return Response.json(body, { headers });
   }
 
-  const url = new URL(request.url);
-  const upstream = new URL(`${PANTA_BASE.replace(/\/$/, "")}/markets/`);
-  for (const key of ["category", "status", "cursor", "limit"]) {
-    const value = url.searchParams.get(key);
-    if (value) upstream.searchParams.set(key, value);
+  const upstream = pantaMarketsUrl(request.url);
+  if (!upstream) {
+    return Response.json({ error: "Panta service configuration is invalid." }, { status: 500, headers });
   }
-  if (!upstream.searchParams.has("limit")) upstream.searchParams.set("limit", "30");
 
   try {
     const response = await fetch(upstream, {

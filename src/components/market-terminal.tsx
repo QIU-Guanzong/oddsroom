@@ -140,16 +140,16 @@ export function MarketTerminal() {
               <span>⌕</span>
               <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search markets" aria-label="Search markets" />
             </label>
-            <div className={styles.categoryTabs} aria-label="Market categories">
+            <div className={styles.categoryTabs} role="group" aria-label="Market categories">
               {categories.map((item) => (
-                <button key={item} type="button" className={item === category ? styles.categoryActive : styles.category} onClick={() => setCategory(item)}>{item}</button>
+                <button key={item} type="button" aria-pressed={item === category} className={item === category ? styles.categoryActive : styles.category} onClick={() => setCategory(item)}>{item}</button>
               ))}
             </div>
             <div className={styles.marketList}>
               {visibleMarkets.map((market) => {
                 const yes = market.yesPrice === null ? "Unavailable" : `${Math.round(Number(market.yesPrice) * 100)}% YES`;
                 return (
-                  <button type="button" key={market.marketId} onClick={() => setSelectedId(market.marketId)} className={market.marketId === selected.marketId ? styles.marketActive : styles.market}>
+                  <button type="button" key={market.marketId} aria-pressed={market.marketId === selected.marketId} onClick={() => setSelectedId(market.marketId)} className={market.marketId === selected.marketId ? styles.marketActive : styles.market}>
                     <span className={styles.marketMeta}>{market.category} · {market.phase}</span>
                     <strong>{market.title}</strong>
                     <span className={styles.marketStats}><b>{yes}</b><span>{formatMoney(market.volumeUsdc)} vol.</span></span>
@@ -226,9 +226,9 @@ export function MarketTerminal() {
 
             <section className={styles.tradePanel} id="scenario">
               <div className={styles.tradeTitle}><h3>Local scenario</h3><span>No signature yet</span></div>
-              <div className={styles.sideToggle}>
-                <button className={side === "yes" ? styles.yesActive : ""} onClick={() => setSide("yes")} type="button">YES <b>{selected.yesPrice === null ? "—" : `${Math.round(Number(selected.yesPrice) * 100)}¢`}</b></button>
-                <button className={side === "no" ? styles.noActive : ""} onClick={() => setSide("no")} type="button">NO <b>{selected.noPrice === null ? "—" : `${Math.round(Number(selected.noPrice) * 100)}¢`}</b></button>
+              <div className={styles.sideToggle} role="group" aria-label="Local scenario side">
+                <button className={side === "yes" ? styles.yesActive : ""} aria-pressed={side === "yes"} onClick={() => setSide("yes")} type="button">YES <b>{selected.yesPrice === null ? "—" : `${Math.round(Number(selected.yesPrice) * 100)}¢`}</b></button>
+                <button className={side === "no" ? styles.noActive : ""} aria-pressed={side === "no"} onClick={() => setSide("no")} type="button">NO <b>{selected.noPrice === null ? "—" : `${Math.round(Number(selected.noPrice) * 100)}¢`}</b></button>
               </div>
               <label className={styles.amountField}>
                 <span>Amount</span>
