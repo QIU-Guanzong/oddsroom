@@ -183,7 +183,7 @@ export function MarketTerminal() {
 
             <div className={styles.metricsStrip}>
               <div><span>Volume</span><strong>{formatMoney(selected.volumeUsdc)}</strong></div>
-              <div><span>Closes</span><strong>{formatDeadline(selected.endTime)}</strong></div>
+              <div><span>{source === "preview" ? "Example close" : "Closes"}</span><strong>{source === "preview" ? "Sample only" : formatDeadline(selected.endTime)}</strong></div>
               <div><span>Phase</span><strong>{selected.phase}</strong></div>
               <div><span>Signal</span><strong>{probability === null ? "Unavailable" : probability >= threshold ? "Above rule" : "Below rule"}</strong></div>
             </div>
