@@ -1,5 +1,7 @@
 # Oddsroom
 
+**Started:** 2026-09-21 (first recorded work; see [`project.json`](./project.json)).
+
 An evidence desk that puts a Panta forecast next to **Solami Blur mainnet trade flow**, so a researcher can inspect the underlying transactions before drawing a conclusion. Token buying pressure is context, not a prediction probability or proof of an event outcome.
 
 **Status:** implementation and automated validation complete; live credential acceptance, public deployment and the required mainnet demo remain pending. With no credentials, the app explicitly shows Preview. No Solami trades are fabricated. Wallet connection/signing and notifications are unavailable in this build.
