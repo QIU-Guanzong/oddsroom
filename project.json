@@ -1,5 +1,19 @@
 {
   "project": "Oddsroom",
   "started_at": "2026-09-21",
-  "started_at_evidence": "Earliest repository commit e2f910535c3036de5a933074f39edd61daea1f03 at 2026-09-21T18:00:52+08:00."
+  "started_at_evidence": "Earliest repository commit e2f910535c3036de5a933074f39edd61daea1f03 at 2026-09-21T18:00:52+08:00.",
+  "last_worked_at": "2026-10-02T02:15:44+08:00",
+  "latest_local_validation": {
+    "recorded_at": "2026-10-02T02:15:44+08:00",
+    "security_update": "Next.js 16.3.5 -> 16.3.8 after npm audit found GHSA-vcvr-r3jv-pc5j; source scan found no next/og or ImageResponse references.",
+    "node": "v22.23.3",
+    "checks": {
+      "lint": "passed",
+      "tests": "13/13 passed",
+      "production_build": "passed",
+      "npm_audit": "0 vulnerabilities",
+      "git_diff_check": "passed"
+    },
+    "live_acceptance": "Not verified. No credentials read or used; Panta/Solami live APIs, public deployment, demo capture, and account-holder submissions remain open."
+  }
 }
